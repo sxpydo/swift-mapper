@@ -25,7 +25,7 @@ export default function RootLayout() {
   useEffect(() => {
     if (!initialized) return;
     if (session) {
-      router.replace("/");
+      router.replace("/(tabs)");
     } else {
       router.replace("/auth/login");
     }
@@ -33,8 +33,7 @@ export default function RootLayout() {
 
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ title: "Swift Mapper" }} />
-      <Stack.Screen name="submit" options={{ title: "Record Sighting" }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="auth/login" options={{ headerShown: false }} />
       <Stack.Screen name="auth/register" options={{ headerShown: false }} />
     </Stack>
