@@ -30,5 +30,10 @@ export default {
       favicon: "./assets/favicon.png",
     },
     plugins: ["expo-router", "expo-status-bar"],
+    extra: {
+      eas: {
+        projectId: "a549bd93-a4cc-43be-81cc-90b849c146a1",
+      },
+    },
   },
 };
