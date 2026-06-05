@@ -34,6 +34,7 @@ export default function RootLayout() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ title: "Swift Mapper" }} />
+      <Stack.Screen name="submit" options={{ title: "Record Sighting" }} />
       <Stack.Screen name="auth/login" options={{ headerShown: false }} />
       <Stack.Screen name="auth/register" options={{ headerShown: false }} />
     </Stack>
