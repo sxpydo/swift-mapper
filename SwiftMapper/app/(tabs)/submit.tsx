@@ -13,8 +13,8 @@ import {
 import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import { supabase } from "../lib/supabase";
-import { SightingType } from "../types";
+import { supabase } from "../../lib/supabase";
+import { SightingType } from "../../types";
 
 const SIGHTING_TYPES: {
   label: string;
@@ -79,7 +79,7 @@ export default function SubmitScreen() {
       longitude: loc.coords.longitude,
     });
     if (place) {
-      const name = [place.neighbourhood, place.district, place.city]
+      const name = [place.subregion, place.district, place.city]
         .filter(Boolean)
         .join(", ");
       setLocationName(name);
@@ -255,7 +255,6 @@ export default function SubmitScreen() {
         value={birdCount}
         onChangeText={setBirdCount}
         keyboardType="number-pad"
-        color="#000"
       />
 
       {/* Notes */}
@@ -268,7 +267,6 @@ export default function SubmitScreen() {
         onChangeText={setNotes}
         multiline
         numberOfLines={4}
-        color="#000"
       />
 
       {/* Photo */}
@@ -373,6 +371,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 14,
     fontSize: 16,
+    color: "#000",
   },
   textArea: {
     height: 100,
