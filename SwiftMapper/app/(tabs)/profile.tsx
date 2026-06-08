@@ -83,9 +83,9 @@ export default function ProfileScreen() {
       <View style={styles.infoCard}>
         <Text style={styles.infoTitle}>Why it matters</Text>
         <Text style={styles.infoText}>
-          Swifts are an endangered species in the UK. Every sighting you record
-          helps conservationists understand where swifts are nesting and how
-          populations are changing over time. Thank you for contributing! 🙏
+          Swifts are a red-listed species in the UK. Every sighting you record
+          helps conservationists track nesting sites and monitor how populations
+          are changing over time. Thank you for contributing! 💚
         </Text>
       </View>
 

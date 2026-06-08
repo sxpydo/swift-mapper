@@ -1,13 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  Modal,
-  ScrollView,
-} from "react-native";
-import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
+import { StyleSheet, View, Text, TouchableOpacity, Modal } from "react-native";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import { useFocusEffect } from "expo-router";
 import { supabase } from "../../lib/supabase";
@@ -26,6 +19,22 @@ const SIGHTING_LABELS: Record<string, string> = {
   single_bird: "🐦 Single Bird",
   other: "📝 Other",
 };
+
+function SeasonBanner() {
+  const month = new Date().getMonth();
+  const isSwiftSeason = month >= 4 && month <= 7;
+
+  if (!isSwiftSeason) return null;
+
+  return (
+    <View style={styles.banner}>
+      <Text style={styles.bannerTitle}>Swift season is here! 🐦</Text>
+      <Text style={styles.bannerSubtitle}>
+        May-August is peak time to record sightings
+      </Text>
+    </View>
+  );
+}
 
 export default function MapScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -85,6 +94,7 @@ export default function MapScreen() {
 
   return (
     <View style={styles.container}>
+      <SeasonBanner />
       <MapView
         style={styles.map}
         provider={PROVIDER_GOOGLE}
@@ -110,7 +120,6 @@ export default function MapScreen() {
         ))}
       </MapView>
 
-      {/* Sighting detail modal */}
       <Modal
         visible={selectedSighting !== null}
         transparent
@@ -178,6 +187,21 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     height: "100%",
+  },
+  banner: {
+    backgroundColor: "#2d6a4f",
+    padding: 12,
+    paddingHorizontal: 16,
+  },
+  bannerTitle: {
+    color: "#fff",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  bannerSubtitle: {
+    color: "#b7e4c7",
+    fontSize: 13,
+    marginTop: 2,
   },
   modalOverlay: {
     flex: 1,
