@@ -8,12 +8,17 @@ export default {
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
+    splash: {
+      image: "./assets/splash.png",
+      resizeMode: "contain",
+      backgroundColor: "#1a56db",
+    },
     ios: {
       supportsTablet: true,
     },
     android: {
       adaptiveIcon: {
-        backgroundColor: "#E6F4FE",
+        backgroundColor: "#1a56db",
         foregroundImage: "./assets/android-icon-foreground.png",
         backgroundImage: "./assets/android-icon-background.png",
         monochromeImage: "./assets/android-icon-monochrome.png",
