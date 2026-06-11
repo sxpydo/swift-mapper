@@ -1,10 +1,17 @@
 import { useEffect, useState, useCallback } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Modal } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+} from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import { useFocusEffect } from "expo-router";
 import { supabase } from "../../lib/supabase";
-import { Sighting } from "../../types";
+import { Sighting, SightingType } from "../../types";
 
 const SIGHTING_COLOURS: Record<string, string> = {
   nest_entry: "#2d6a4f",
@@ -20,12 +27,17 @@ const SIGHTING_LABELS: Record<string, string> = {
   other: "📝 Other",
 };
 
+const ALL_TYPES: SightingType[] = [
+  "nest_entry",
+  "screaming_party",
+  "single_bird",
+  "other",
+];
+
 function SeasonBanner() {
   const month = new Date().getMonth();
   const isSwiftSeason = month >= 4 && month <= 7;
-
   if (!isSwiftSeason) return null;
-
   return (
     <View style={styles.banner}>
       <Text style={styles.bannerTitle}>Swift season is here! 🐦</Text>
@@ -37,14 +49,11 @@ function SeasonBanner() {
 }
 
 export default function MapScreen() {
-  const [location, setLocation] = useState<Location.LocationObject | null>(
-    null,
-  );
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [sightings, setSightings] = useState<Sighting[]>([]);
-  const [selectedSighting, setSelectedSighting] = useState<Sighting | null>(
-    null,
-  );
+  const [selectedSighting, setSelectedSighting] = useState<Sighting | null>(null);
+  const [activeFilters, setActiveFilters] = useState<SightingType[]>([...ALL_TYPES]);
 
   useEffect(() => {
     async function getCurrentLocation() {
@@ -62,7 +71,7 @@ export default function MapScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchSightings();
-    }, []),
+    }, [])
   );
 
   async function fetchSightings() {
@@ -70,11 +79,22 @@ export default function MapScreen() {
       .from("sightings")
       .select("*")
       .order("sighted_at", { ascending: false });
-
     if (!error && data) {
       setSightings(data);
     }
   }
+
+  function toggleFilter(type: SightingType) {
+    setActiveFilters((prev) =>
+      prev.includes(type)
+        ? prev.filter((t) => t !== type)
+        : [...prev, type]
+    );
+  }
+
+  const filteredSightings = sightings.filter((s) =>
+    activeFilters.includes(s.sighting_type as SightingType)
+  );
 
   if (errorMsg) {
     return (
@@ -95,6 +115,33 @@ export default function MapScreen() {
   return (
     <View style={styles.container}>
       <SeasonBanner />
+
+      {/* Filter toggles */}
+      <View style={styles.filterRow}>
+        {ALL_TYPES.map((type) => {
+          const isActive = activeFilters.includes(type);
+          return (
+            <TouchableOpacity
+              key={type}
+              style={[
+                styles.filterChip,
+                isActive && { backgroundColor: SIGHTING_COLOURS[type] },
+              ]}
+              onPress={() => toggleFilter(type)}
+            >
+              <Text
+                style={[
+                  styles.filterChipText,
+                  isActive && styles.filterChipTextActive,
+                ]}
+              >
+                {SIGHTING_LABELS[type]}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
       <MapView
         style={styles.map}
         provider={PROVIDER_GOOGLE}
@@ -107,7 +154,7 @@ export default function MapScreen() {
         showsUserLocation={true}
         showsMyLocationButton={true}
       >
-        {sightings.map((sighting) => (
+        {filteredSightings.map((sighting) => (
           <Marker
             key={sighting.id}
             coordinate={{
@@ -152,11 +199,7 @@ export default function MapScreen() {
                 <Text style={styles.modalDate}>
                   {new Date(selectedSighting.sighted_at).toLocaleDateString(
                     "en-GB",
-                    {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    },
+                    { day: "numeric", month: "long", year: "numeric" }
                   )}
                 </Text>
                 <TouchableOpacity
@@ -183,11 +226,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  map: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-  },
   banner: {
     backgroundColor: "#2d6a4f",
     padding: 12,
@@ -202,6 +240,38 @@ const styles = StyleSheet.create({
     color: "#b7e4c7",
     fontSize: 13,
     marginTop: 2,
+  },
+  filterRow: {
+    flexDirection: "row",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: "#fff",
+    gap: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  filterChip: {
+    flex: 1,
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  filterChipText: {
+    fontSize: 11,
+    color: "#666",
+    fontWeight: "500",
+  },
+  filterChipTextActive: {
+    color: "#fff",
+  },
+  map: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
   },
   modalOverlay: {
     flex: 1,
